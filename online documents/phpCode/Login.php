@@ -51,8 +51,9 @@ $_SESSION['did']=$iid;
 header('location: doctorhome.php');
 }
 
-$findadmin=mysql_query("select name,password from admin where name='$username' AND password='$password' ")or die(mysql_error());
-if(mysql_num_rows($findadmin))
+$findadmin=$conn->prepare("select name,password from admin where name=:username AND password=:pass");
+	$findadmin->execute(array(":username"=>$username,":password"=>$pass));
+if($findadmin->rowCount()==1)
 {
 $_SESSION['usertype']="admin";
 $_SESSION['ausername']=$username;
@@ -60,13 +61,13 @@ header('location: adminhome.php');
 
 }
 
-
 else {
-$findclient=mysql_query("select username,password,client_id,con_id from client_login where username='$username' AND password='$password' ");
-if (mysql_num_rows($findclient)==1)
+$findclient=$conn->prepare("select username,password,client_id,con_id from client_login where username=:username AND password=:pass ");
+	$findclient->execute(array(":username"=>$username,":password"=>$pass));
+if ($findclient->rowCount()==1)
 {
 
-$mss=mysql_fetch_row($findclient);
+$mss=$findclient->fetch($findclient);
 $ccid=$mss[2];
 $_SESSION['cid']=$ccid;
 
